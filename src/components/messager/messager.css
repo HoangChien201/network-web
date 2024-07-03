@@ -1,0 +1,39 @@
+.messager{
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.messagerTop{
+    display: flex;
+}
+
+.messagerImg{
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.messagerText{
+    padding: 10px;
+    border-radius: 20px;
+    background-color: var(--color-primary);
+    color: white;
+    max-width: 300px;
+}
+
+.messagerBottom{
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.messager.own{
+    align-items: flex-end;
+}
+
+.messager.own .messagerText{
+    background-color: lightgray;
+    color: black;
+}

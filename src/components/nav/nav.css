@@ -1,0 +1,106 @@
+nav{
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--color-border);
+    color: white;
+    position: sticky;
+    z-index: 10;
+    background: var(--color-primary);
+    top: 0;
+}
+
+.nav-container{
+    width: 96%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-container a{
+    color: white;
+    font-size: 1.1rem;
+}
+
+.nav-left{
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.logo{
+    color: white;
+    font-size: 35px;
+    font-weight: 700;
+}
+
+.Nav-Serchbar{
+    display: flex;
+    align-items: center;
+    border: 2px solid var(--color-primary);
+    border-radius: 30px;
+    padding: 5px 10px;
+    width: 60%;
+    height: 38px;
+    background-color: white;
+}
+
+.Nav-Serchbar input{
+    background: transparent;
+    color: var(--color-primary);
+    width: 100%;
+    font-weight: 600;
+}
+
+.nav-right{
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.topbarIconItem {
+    margin-right: 5px;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .topbarIconBadge {
+    width: 15px;
+    height: 15px;
+    background-color: limegreen;
+    border-radius: 50%;
+    color: white;
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+
+
+/* .........................Media Scrin Start............................. */
+
+@media (max-width:768px) {
+    nav .user{
+        display: none;
+    }
+    .nav-container a{
+        font-size: 1rem;
+    }
+    .nav-container .logo{
+        font-size: 1.3rem;
+    }
+    .Nav-Serchbar{
+        border: none;
+        padding: 0;
+    }
+    .Nav-Serchbar input{
+        display: none;
+    }
+    .nav-left,.nav-right{
+        gap: 20px;
+    }
+}
