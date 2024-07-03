@@ -35,8 +35,8 @@ export default function Register() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8800/api/auth/register",
-        { username, email, password }
+        "https://network-social-sever.onrender.com/user",
+        { username, email, password, role: 2 }
       );
       setError("Đăng ký thành công!");
       navigate("/login");

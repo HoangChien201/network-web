@@ -23,7 +23,7 @@ export default function Login() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8800/api/auth/login",
+        "https://network-social-sever.onrender.com/auth/sign-in/",
         { email, password }
       );
       localStorage.setItem("token", response.data.token);
