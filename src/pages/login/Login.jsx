@@ -26,7 +26,7 @@ export default function Login() {
         "https://network-social-sever.onrender.com/auth/sign-in/",
         { email, password }
       );
-      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("token", response.data.data.token);
       setError("Đăng nhập thành công!");
       navigate("/");
     } catch (error) {
