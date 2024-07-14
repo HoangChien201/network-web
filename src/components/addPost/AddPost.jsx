@@ -2,18 +2,16 @@ import "./addPost.css";
 import { useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faImage,
-  faSmile,
-  faTag,
-  faVideo,
-} from "@fortawesome/free-solid-svg-icons";
+import { faImage, faSmile, faTag } from "@fortawesome/free-solid-svg-icons";
 import CurrentUserData from "../../FackApis/CurrentUserData";
 
 export default function AddPost() {
   const [content, setContent] = useState("");
-  const [mediaUrls, setMediaUrls] = useState([]);
+  const [mediaFiles, setMediaFiles] = useState([]);
   const [mediaType, setMediaType] = useState(""); // image hoặc video
+  const [tags, setTags] = useState([]); // Giả sử bạn có một phương thức để thêm tags
+  const [permission, setPermission] = useState(1); // Giả sử mặc định là friend
+  const [error, setError] = useState(null); // Để lưu trữ lỗi
 
   const handleContentChange = (e) => {
     setContent(e.target.value);
@@ -25,32 +23,55 @@ export default function AddPost() {
       url: URL.createObjectURL(file),
       resource_type: file.type.startsWith("image/") ? "image" : "video",
     }));
-    setMediaUrls(urls);
+    setMediaFiles(urls);
     setMediaType(files[0].type.startsWith("image/") ? "image" : "video");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Kiểm tra dữ liệu trước khi gửi
+    if (!content || !mediaType || mediaFiles.length === 0) {
+      setError("Vui lòng nhập nội dung và chọn ảnh/video.");
+      return;
+    }
+
     const postData = {
       content: content,
-      type: mediaType === "image" ? 1 : 2, // Giả sử type 1 là hình ảnh và type 2 là video
-      medias: mediaUrls,
+      type: mediaType === "image" ? 1 : 2,
+      permission: permission,
+      tags: tags,
+      medias: mediaFiles,
     };
 
     try {
       const token = localStorage.getItem("token"); // Giả sử bạn lưu token ở localStorage
+      if (!token) {
+        throw new Error("Token không tồn tại. Vui lòng đăng nhập lại.");
+      }
+
       const response = await axios.post(
-        "https://network-social-sever.onrender.com/posts",
+        "https://network-sever-1.onrender.com/posts",
         postData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
-      console.log(response.data);
+
+      console.log("Response data:", response.data);
+
+      if (response.data.status === -1) {
+        setError(response.data.message);
+      } else {
+        setError(null); // Xóa lỗi nếu thành công
+        window.location.reload(); // Tự động load lại trang sau khi đăng bài thành công
+      }
     } catch (error) {
       console.error("Error creating post:", error);
+      setError("Có lỗi xảy ra khi tạo bài đăng. Vui lòng thử lại."); // Lưu trữ lỗi để hiển thị cho người dùng
     }
   };
 
@@ -68,7 +89,6 @@ export default function AddPost() {
           ĐĂNG
         </button>
       </div>
-
       <div className="post-categories">
         <label htmlFor="fileImage">
           <input
@@ -80,7 +100,7 @@ export default function AddPost() {
           />
           <span>
             <FontAwesomeIcon icon={faImage} />
-            Ảnh
+            Ảnh/Video
           </span>
         </label>
 
@@ -93,6 +113,20 @@ export default function AddPost() {
           Cảm xúc
         </span>
       </div>
+      {mediaFiles.length > 0 && (
+        <div className="preview">
+          {mediaFiles.map((media, index) => (
+            <div key={index} className="preview-item">
+              {media.resource_type === "image" ? (
+                <img src={media.url} alt={`media ${index}`} />
+              ) : (
+                <video src={media.url} controls />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      {error && <p className="error-message">{error}</p>} {/* Hiển thị lỗi */}
     </form>
   );
 }

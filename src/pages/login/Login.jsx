@@ -23,7 +23,7 @@ export default function Login() {
 
     try {
       const response = await axios.post(
-        "https://network-social-sever.onrender.com/auth/sign-in/",
+        "https://network-sever-1.onrender.com/auth/sign-in/",
         { email, password }
       );
       localStorage.setItem("token", response.data.data.token);

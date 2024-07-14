@@ -27,6 +27,9 @@ export default function Feed({ fed }) {
   // Sử dụng comment_count từ dữ liệu nếu có, mặc định là 0 nếu không có
   const commentsCount = fed.comment_count || 0;
 
+  // Lấy URL từ media nếu có
+  const mediaUrl = fed.media && fed.media.length > 0 ? fed.media[0].url : null;
+
   return (
     <div className="feed" key={fed.id}>
       <div className="top-content">
@@ -48,9 +51,7 @@ export default function Feed({ fed }) {
       </div>
       <div className="mid-content">
         <p>{fed.content}</p>
-        {fed.media && fed.media.length > 0 && (
-          <img src={fed.media[0]} alt="Posted media" />
-        )}
+        {mediaUrl && <img src={mediaUrl} alt="Posted media" />}
       </div>
       <div className="bottom-content">
         <div className="action-item" onClick={likeHandler}>

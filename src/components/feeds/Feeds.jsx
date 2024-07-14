@@ -14,10 +14,10 @@ export default function Feeds() {
         // Giả sử bạn lưu token trong localStorage
         const token = localStorage.getItem("token");
 
-        console.log('token',token);
+        console.log("token", token);
 
         const response = await axios.get(
-          "https://network-social-sever.onrender.com/posts/get-by-user-request",
+          "https://network-sever-1.onrender.com/posts/get-by-user-request",
           {
             headers: {
               Authorization: `Bearer ${token}`, // Thêm token vào header
@@ -25,6 +25,7 @@ export default function Feeds() {
           }
         );
         setUserRequestPosts(response.data);
+        console.log('rb',response.data);
       } catch (error) {
         console.error("Error fetching user_request posts:", error);
         if (error.response) {
