@@ -3,6 +3,8 @@ import "./signup.css";
 import axios from "axios";
 
 import { Link, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 export default function Register() {
   const [username, setUserName] = useState("");
@@ -11,6 +13,8 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  const [loadingAPI, setLoadingAPI] = useState(false);
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
@@ -32,7 +36,7 @@ export default function Register() {
       setError("Mật khẩu xác nhận không khớp.");
       return;
     }
-
+    setLoadingAPI(false);
     try {
       const response = await axios.post(
         "https://network-social-sever.onrender.com/user",
@@ -45,6 +49,7 @@ export default function Register() {
         "Đăng ký không thành công. Vui lòng kiểm tra lại thông tin đăng ký."
       );
     }
+    setLoadingAPI(true);
   };
 
   return (
@@ -88,7 +93,13 @@ export default function Register() {
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
             <button className="loginButton" onClick={handleRegister}>
-              Đăng ký
+              {loadingAPI ? (
+                <span>
+                  <FontAwesomeIcon icon={faSpinner} spin />
+                </span>
+              ) : (
+                "Đăng ký"
+              )}
             </button>
             <Link to="/login" className="loginRegisterButton">
               <button className="loginRegisterButton">
