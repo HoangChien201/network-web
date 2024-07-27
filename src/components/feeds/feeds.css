@@ -37,3 +37,11 @@
     margin: 1rem 0;
 }
 
+.feed .action-item .like {
+    color: grey; /* Màu mặc định cho biểu tượng like */
+  }
+  
+  .feed .action-item .like.liked {
+    color: red; /* Màu đỏ khi đã thích */
+  }
+

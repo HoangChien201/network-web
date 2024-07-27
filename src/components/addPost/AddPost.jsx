@@ -1,38 +1,132 @@
-import './addPost.css'
-
-//FakeAPI..........................
+import "./addPost.css";
+import { useState } from "react";
+import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faImage, faSmile, faTag } from "@fortawesome/free-solid-svg-icons";
 import CurrentUserData from "../../FackApis/CurrentUserData";
 
-//FontAwesome........................
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faImage, faSmile, faTag, faVideo } from '@fortawesome/free-solid-svg-icons';
-
 export default function AddPost() {
+  const [content, setContent] = useState("");
+  const [mediaFiles, setMediaFiles] = useState([]);
+  const [mediaType, setMediaType] = useState(""); // image hoặc video
+  const [tags, setTags] = useState([]); // Giả sử bạn có một phương thức để thêm tags
+  const [permission, setPermission] = useState(1); // Giả sử mặc định là friend
+  const [error, setError] = useState(null); // Để lưu trữ lỗi
+
+  const handleContentChange = (e) => {
+    setContent(e.target.value);
+  };
+
+  const handleMediaChange = (e) => {
+    const files = Array.from(e.target.files);
+    const urls = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      resource_type: file.type.startsWith("image/") ? "image" : "video",
+    }));
+    setMediaFiles(urls);
+    setMediaType(files[0].type.startsWith("image/") ? "image" : "video");
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Kiểm tra dữ liệu trước khi gửi
+    if (!content || !mediaType || mediaFiles.length === 0) {
+      setError("Vui lòng nhập nội dung và chọn ảnh/video.");
+      return;
+    }
+
+    const postData = {
+      content: content,
+      type: mediaType === "image" ? 1 : 2,
+      permission: permission,
+      tags: tags,
+      medias: mediaFiles,
+    };
+
+    try {
+      const token = localStorage.getItem("token"); // Giả sử bạn lưu token ở localStorage
+      if (!token) {
+        throw new Error("Token không tồn tại. Vui lòng đăng nhập lại.");
+      }
+
+      const response = await axios.post(
+        "https://network-sever-1.onrender.com/posts",
+        postData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Response data:", response.data);
+
+      if (response.data.status === -1) {
+        setError(response.data.message);
+      } else {
+        setError(null); // Xóa lỗi nếu thành công
+        window.location.reload(); // Tự động load lại trang sau khi đăng bài thành công
+      }
+    } catch (error) {
+      console.error("Error creating post:", error);
+      setError("Có lỗi xảy ra khi tạo bài đăng. Vui lòng thử lại."); // Lưu trữ lỗi để hiển thị cho người dùng
+    }
+  };
+
   return (
-    <form className='postForm'>
+    <form className="postForm" onSubmit={handleSubmit}>
+      <div className="user form-top">
+        <img src={CurrentUserData[0].ProfieImage} alt="User profile" />
+        <input
+          type="text"
+          placeholder="Bạn đang nghĩ gì?"
+          value={content}
+          onChange={handleContentChange}
+        />
+        <button type="submit" className="btn btn-primary">
+          ĐĂNG
+        </button>
+      </div>
+      <div className="post-categories">
+        <label htmlFor="fileImage">
+          <input
+            type="file"
+            id="fileImage"
+            accept="image/*,video/*"
+            multiple
+            onChange={handleMediaChange}
+          />
+          <span>
+            <FontAwesomeIcon icon={faImage} />
+            Ảnh/Video
+          </span>
+        </label>
 
-        <div className="user form-top">
-            <img src={CurrentUserData.map(user=>(user.ProfieImage))} alt="" />
-            <input type="text" placeholder="Bạn đang nghĩ gì?" />
-            <button type='submit' className='btn btn-primary'>ĐĂNG</button>
+        <span>
+          <FontAwesomeIcon icon={faTag} />
+          Tag
+        </span>
+        <span>
+          <FontAwesomeIcon icon={faSmile} />
+          Cảm xúc
+        </span>
+      </div>
+      {mediaFiles.length > 0 && (
+        <div className="preview">
+          {mediaFiles.map((media, index) => (
+            <div key={index} className="preview-item">
+              {media.resource_type === "image" ? (
+                <img src={media.url} alt={`media ${index}`} />
+              ) : (
+                <video src={media.url} controls />
+              )}
+            </div>
+          ))}
         </div>
-
-        <div className="post-categories">
-            <label htmlFor="file">
-                <input type="file" id='file'/>
-                <span><FontAwesomeIcon icon={faImage}/>Ảnh</span>
-            </label>
-
-            <label htmlFor="file">
-                <input type="file" id='file'/>
-                <span><FontAwesomeIcon icon={faVideo}/>Video</span>
-            </label>
-
-            <span><FontAwesomeIcon icon={faTag}/>Tag</span>
-            <span><FontAwesomeIcon icon={faSmile}/>Cảm xúc</span>
-
-        </div>
-
+      )}
+      {error && <p className="error-message">{error}</p>} {/* Hiển thị lỗi */}
     </form>
-  )
+  );
 }

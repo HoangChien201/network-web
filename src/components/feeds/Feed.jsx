@@ -1,66 +1,80 @@
 import "./feeds.css";
-
-import { Link } from "react-router-dom";
-
-//Component....................
-import Comments from "../comments/Comments";
-
-//FontAwesome..................
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faComment, faHeart, faListDots, faShare } from "@fortawesome/free-solid-svg-icons";
-
-//States..............
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import Comments from "../comments/Comments";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faComment,
+  faHeart,
+  faListAlt,
+  faShare,
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function Feed({ fed }) {
+  const [openComment, setOpenComment] = useState(false);
+  const [like, setLike] = useState(fed.like_count || 0);
+  const [isLiked, setIsLiked] = useState(false);
 
-//States Discure.............
-let [openComment, setOpenComment] = useState(false);
-const CommentHandeler =()=>{
-    setOpenComment(!openComment)
-}
+  const likeHandler = () => {
+    setLike(isLiked ? like - 1 : like + 1);
+    setIsLiked(!isLiked);
+  };
 
-const [like,setLike] = useState(fed.like)
-const [isLiked,setIsLiked] = useState(false)
+  const commentHandler = () => {
+    setOpenComment(!openComment);
+  };
 
-const likeHandler =()=>{
-  setLike(isLiked ? like-1 : like+1)
-  setIsLiked(!isLiked)
-}
+  // Sử dụng comment_count từ dữ liệu nếu có, mặc định là 0 nếu không có
+  const commentsCount = fed.comment_count || 0;
 
+  // Lấy URL từ media nếu có
+  const mediaUrl = fed.media && fed.media.length > 0 ? fed.media[0].url : null;
 
   return (
     <div className="feed" key={fed.id}>
       <div className="top-content">
-        <Link to="/profile/id">
+        <Link to={`/profile/${fed.creater.id}`}>
           <div className="user">
-            <img src={fed.feedProfile} />
+            <img
+              src={fed.creater.avatar}
+              alt={`${fed.creater.fullname}'s profile`}
+            />
             <div>
-              <h5>{fed.name}</h5>
-              <small>1 Minutes Ago</small>
+              <h5>{fed.creater.fullname}</h5>
+              <small>1 minute ago</small>
             </div>
           </div>
         </Link>
         <span>
-          <FontAwesomeIcon icon={faListDots} />
+          <FontAwesomeIcon icon={faListAlt} />
         </span>
       </div>
-      <div className="mid-comtent">
-        <p>{fed.desc}</p>
-        <img src={fed.feedImage} />
+      <div className="mid-content">
+        <p>{fed.content}</p>
+        {mediaUrl && <img src={mediaUrl} alt="Posted media" />}
       </div>
       <div className="bottom-content">
-        <div className="action-item">
-            <span className="like" onClick={likeHandler}><FontAwesomeIcon icon={faHeart} />{like} like</span>
+        <div className="action-item" onClick={likeHandler}>
+          <span>
+            <FontAwesomeIcon
+              icon={faHeart}
+              className={`like ${isLiked ? "liked" : ""}`}
+            />{" "}
+            {like} like
+          </span>
         </div>
-        <div className="action-item" onClick={CommentHandeler}>
-            <span><FontAwesomeIcon icon={faComment}/>2 Comment</span>
+        <div className="action-item" onClick={commentHandler}>
+          <span>
+            <FontAwesomeIcon icon={faComment} /> {commentsCount} Comment
+          </span>
         </div>
         <div className="action-item">
-            <span><FontAwesomeIcon icon={faShare}/>11 Share</span>
+          <span>
+            <FontAwesomeIcon icon={faShare} /> {fed.share_count || 0} Share
+          </span>
         </div>
       </div>
-      {openComment && <Comments/>}
+      {openComment && <Comments postId={fed.id} />}
     </div>
   );
 }
