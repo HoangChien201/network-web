@@ -7,6 +7,9 @@ import QRCode from 'qrcode.react';
 import { url } from "../../contants/url";
 import { socket } from "../../../socket"; 
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,6 +34,7 @@ export default function Login() {
 
   }, []);
   //get id device key
+  const [loadingAPI, setLoadingAPI] = useState(false);
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
@@ -42,13 +46,13 @@ export default function Login() {
       setError("Định dạng email không hợp lệ.");
       return;
     }
-
+    setLoadingAPI(true);
     try {
       const response = await axios.post(
         `${url}/auth/sign-in/`,
         { email, password }
       );
-      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("token", response.data.data.token);
       setError("Đăng nhập thành công!");
       navigate("/");
     } catch (error) {
@@ -56,6 +60,7 @@ export default function Login() {
         "Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin đăng nhập."
       );
     }
+    setLoadingAPI(false);
   };
 
 
@@ -106,11 +111,19 @@ export default function Login() {
             />
 
             <button
-              className={email && password ? "loginButton" : "loginActive"}
-              disabled={email && password ? false : true}
-              onClick={() => handleLogin()}
+              className={
+                email && password && !loadingAPI ? "loginButton" : "loginActive"
+              }
+              disabled={loadingAPI || !(email && password)}
+              onClick={handleLogin}
             >
-              Đăng nhập
+              {loadingAPI ? (
+                <span>
+                  <FontAwesomeIcon icon={faSpinner} spin/>
+                </span>
+              ) : (
+                "Đăng nhập"
+              )}
             </button>
             <span className="loginForgot">Quên mật khẩu?</span>
             <Link to="/signup" className="loginRegisterButton">
