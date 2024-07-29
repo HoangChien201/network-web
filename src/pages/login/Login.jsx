@@ -25,8 +25,11 @@ export default function Login() {
       const murmur = Fingerprint2.x64hash128(values.join(''), 31);
       console.log(murmur);
       
+      //nhận thong tin user được trả về khi bên mobile đẩy sang
       socket.on(`qr-login-${murmur}`,(data)=>{
+        //xử lý đăng nhập
         console.log(data);
+        
       })
 
       setDeviceKey(murmur);
