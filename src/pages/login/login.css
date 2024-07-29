@@ -3,8 +3,8 @@
     height: 100vh;
     background-color: #f0f2f5;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
   }
   
   .loginWrapper {
@@ -13,19 +13,36 @@
     display: flex;
   }
   
-  .loginLeft,
   .loginRight {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
+
+  .loginLeft{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+  }
+
+  .qrcode{
+    border: #000 solid 1px;
+    height: 300px;
+    width: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
   
   .loginLogo {
     font-size: 100px;
     font-weight: 800;
     color: var(--color-primary);
-    margin-bottom: 10px;
   }
   
   .loginDesc {

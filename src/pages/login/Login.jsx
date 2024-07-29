@@ -1,14 +1,36 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import "./login.css";
 import axios from "axios";
-
-import { useState } from "react";
+import Fingerprint2 from 'fingerprintjs2';
+import QRCode from 'qrcode.react';
+import { url } from "../../contants/url";
+import { socket } from "../../../socket"; 
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  //get id device key
+  const [deviceKey, setDeviceKey] = useState('');
+
+  useEffect(() => {
+    Fingerprint2.get((components) => {
+      const values = components.map((component) => component.value);
+      const murmur = Fingerprint2.x64hash128(values.join(''), 31);
+      console.log(murmur);
+      
+      socket.on(`qr-login-${murmur}`,(data)=>{
+        console.log(data);
+      })
+
+      setDeviceKey(murmur);
+    });
+
+  }, []);
+  //get id device key
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
@@ -23,7 +45,7 @@ export default function Login() {
 
     try {
       const response = await axios.post(
-        "https://network-social-sever.onrender.com/auth/sign-in/",
+        `${url}/auth/sign-in/`,
         { email, password }
       );
       localStorage.setItem("token", response.data.token);
@@ -36,13 +58,31 @@ export default function Login() {
     }
   };
 
+
   return (
     <div className="login">
+      <div className="loginText">
+        <h3 className="loginLogo">NetForge</h3>
+        {/* <span className="loginDesc">
+          Kết nối với bạn bè và thế giới cùng với NetForge.
+        </span> */}
+      </div>
       <div className="loginWrapper">
         <div className="loginLeft">
-          <h3 className="loginLogo">NetForge</h3>
-          <span className="loginDesc">
-            Kết nối với bạn bè và thế giới cùng với NetForge.
+          <div className="qrcode">
+            {
+              deviceKey &&
+              <QRCode
+                value={deviceKey}
+                size={256}
+                bgColor="#ffffff"
+                fgColor="#000000"
+                level="Q"
+              />
+            }
+          </div>
+          <span>
+            Sử dụng ứng dụng NetForge để quét mã QR
           </span>
         </div>
         <div className="loginRight">
