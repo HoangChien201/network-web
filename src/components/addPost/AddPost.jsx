@@ -19,11 +19,11 @@ export default function AddPost() {
 
   const handleMediaChange = (e) => {
     const files = Array.from(e.target.files);
-    const urls = files.map((file) => ({
-      url: URL.createObjectURL(file),
-      resource_type: file.type.startsWith("image/") ? "image" : "video",
-    }));
-    setMediaFiles(urls);
+    // const urls = files.map((file) => ({
+    //   url: URL.createObjectURL(file),
+    //   resource_type: file.type.startsWith("image/") ? "image" : "video",
+    // }));
+    setMediaFiles(files);
     setMediaType(files[0].type.startsWith("image/") ? "image" : "video");
   };
 
@@ -36,12 +36,22 @@ export default function AddPost() {
       return;
     }
 
-    const postData = {
-      content: content,
-      type: mediaType === "image" ? 1 : 2,
-      permission: permission,
-      tags: tags,
-      medias: mediaFiles,
+    // const postData = {
+    //   content: content,
+    //   type: mediaType === "image" ? 1 : 2,
+    //   permission: permission,
+    //   tags: tags,
+    //   medias: mediaFiles,
+    // };
+
+    const uploadMedia = async (file) => {
+      const formData = new FormData();
+      formData.append("files", file);
+      const data = await axios.post(
+        "https://network-sever-1.onrender.com/image/uploads",
+        formData
+      );
+      return data;
     };
 
     try {
@@ -49,6 +59,23 @@ export default function AddPost() {
       if (!token) {
         throw new Error("Token không tồn tại. Vui lòng đăng nhập lại.");
       }
+
+      // Upload tất cả các file media và lấy URL
+      const mediaUrls = await Promise.all(mediaFiles.map(uploadMedia));
+      console.log(mediaUrls);
+
+      const postData = {
+        content: content,
+        type: 1,
+        permission: permission,
+        tags: tags,
+        medias: mediaUrls.map((media) => ({
+          url: media.data[0].url,
+          resource_type: media.data[0].resource_type,
+        })),
+      };
+
+      console.log(postData);
 
       const response = await axios.post(
         "https://network-sever-1.onrender.com/posts",
@@ -117,10 +144,10 @@ export default function AddPost() {
         <div className="preview">
           {mediaFiles.map((media, index) => (
             <div key={index} className="preview-item">
-              {media.resource_type === "image" ? (
-                <img src={media.url} alt={`media ${index}`} />
+              {media.type.startsWith("image/") ? (
+                <img src={URL.createObjectURL(media)} alt={`media ${index}`} />
               ) : (
-                <video src={media.url} controls />
+                <video src={URL.createObjectURL(media)} controls />
               )}
             </div>
           ))}
