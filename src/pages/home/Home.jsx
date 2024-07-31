@@ -10,7 +10,7 @@ export default function () {
   return (
     <>
     <Stories/>
-    <AddPost/>
+    {/* <AddPost/> */}
     <Feeds/>
     </>
   )

@@ -35,7 +35,7 @@ nav{
     font-weight: 700;
 }
 
-.Nav-Serchbar{
+.Nav-Searchbar{
     display: flex;
     align-items: center;
     border: 2px solid var(--color-primary);
@@ -46,12 +46,67 @@ nav{
     background-color: white;
 }
 
-.Nav-Serchbar input{
+.Nav-Searchbar input{
     background: transparent;
     color: var(--color-primary);
     width: 100%;
     font-weight: 600;
 }
+
+.Nav-Searchbar .search-results {
+    position: absolute;
+    top: 100%;
+    left: 21%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 10px 10px;
+    overflow: hidden;
+    max-width: 845px;
+    max-height: 300px;
+    overflow-y: auto;
+    align-items: center;
+  }
+
+  .Nav-Searchbar .search-results::-webkit-scrollbar{
+    display: none;
+  }
+  
+  .Nav-Searchbar .search-result-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s ease;
+    color: var(--color-primary);
+  }
+  
+  .Nav-Searchbar .search-result-item:last-child {
+    border-bottom: none;
+  }
+  
+  .Nav-Searchbar .search-result-item:hover {
+    background-color: var(--hover-background-color);
+  }
+  
+  .Nav-Searchbar .search-result-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .Nav-Searchbar .search-result-item h4 {
+    font-size: 16px;
+    color: var(--primary-color);
+    margin: 0;
+  }
+  
+  .Nav-Searchbar .search-result-item p {
+    font-size: 14px;
+    color: var(--secondary-text-color);
+    margin: 0;
+  }
 
 .nav-right{
     display: flex;

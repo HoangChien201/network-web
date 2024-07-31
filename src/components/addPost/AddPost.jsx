@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage, faSmile, faTag } from "@fortawesome/free-solid-svg-icons";
 import CurrentUserData from "../../FackApis/CurrentUserData";
 
-export default function AddPost() {
+export default function AddPost({ onPostCreated }) {
   const [content, setContent] = useState("");
   const [mediaFiles, setMediaFiles] = useState([]);
   const [mediaType, setMediaType] = useState(""); // image hoặc video
@@ -94,7 +94,7 @@ export default function AddPost() {
         setError(response.data.message);
       } else {
         setError(null); // Xóa lỗi nếu thành công
-        window.location.reload(); // Tự động load lại trang sau khi đăng bài thành công
+        onPostCreated(); // Gọi hàm callback để cập nhật danh sách bài viết
       }
     } catch (error) {
       console.error("Error creating post:", error);

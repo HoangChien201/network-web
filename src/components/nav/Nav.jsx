@@ -1,5 +1,7 @@
 import "./nav.css";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 //Fake API Data.................
 import CurrentUser from "../../FackApis/CurrentUserData";
@@ -17,6 +19,36 @@ import {
 } from "@fortawesome/free-regular-svg-icons";
 
 export default function Nav() {
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const handleSearch = async (e) => {
+    setSearchKeyword(e.target.value);
+
+    if (e.target.value.trim() === "") {
+      setSearchResults([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `https://network-sever-1.onrender.com/user/search?keyword=${e.target.value}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    }
+    setLoading(false);
+  };
+
   return (
     <nav>
       <div className="nav-container">
@@ -28,17 +60,41 @@ export default function Nav() {
           <Link to="/">
             <FontAwesomeIcon icon={faHome} />
           </Link>
-          <Link to="/profile/id">
+          <Link to={`/profile/${CurrentUser.id}`}>
             <FontAwesomeIcon icon={faUser} />
           </Link>
         </div>
 
-        <div className="Nav-Serchbar">
+        <div className="Nav-Searchbar">
           <FontAwesomeIcon
             icon={faSearch}
             style={{ color: "var(--color-primary)", paddingRight: "5px" }}
           />
-          <input type="search" placeholder="Tìm kiếm bạn bè trên NetForge" />
+          <input
+            type="search"
+            placeholder="Tìm kiếm bạn bè trên NetForge"
+            value={searchKeyword}
+            onChange={handleSearch}
+          />
+          {loading && <div>Loading...</div>}
+          {searchResults.length > 0 && (
+            <div className="search-results">
+              {searchResults.map((result) => (
+                <Link key={result.id} to={`/profile/${result.id}`}>
+                  <div className="search-result-item">
+                    <img
+                      src={result.avatar || "/path/to/default/avatar.jpg"}
+                      alt="avatar"
+                    />
+                    <div>
+                      <h4>{result.fullname}</h4>
+                      <p>{result.email}</p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         {/*............................ Nav Aria Right........................ */}
@@ -62,9 +118,12 @@ export default function Nav() {
             <FontAwesomeIcon icon={faBars} />
           </Link>
           <div className="user">
-            <Link to="/profile/di" className="user">
-              <img src={CurrentUser.map((user) => user.ProfieImage)} alt="" />
-              <h4>Trí</h4>
+            <Link to={`/profile/${CurrentUser.id}`} className="user">
+              <img
+                src={CurrentUser[0].avatar || "/path/to/default/avatar.jpg"}
+                alt=""
+              />
+              <h4>{CurrentUser[0].fullname}</h4>
             </Link>
           </div>
         </div>
