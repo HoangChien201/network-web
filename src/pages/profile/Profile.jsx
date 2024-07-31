@@ -8,7 +8,7 @@ export default function Profile() {
   return (
     <>
       <UserProfile/>
-      <AddPost/>
+      {/* <AddPost/> */}
       <Feeds/>
     </>
   )
