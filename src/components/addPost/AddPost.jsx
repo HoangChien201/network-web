@@ -30,8 +30,14 @@ export default function AddPost({ onPostCreated }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // // Kiểm tra dữ liệu trước khi gửi
+    // if (!content || !mediaType || mediaFiles.length === 0) {
+    //   setError("Vui lòng nhập nội dung và chọn ảnh/video.");
+    //   return;
+    // }
+
     // Kiểm tra dữ liệu trước khi gửi
-    if (!content || !mediaType || mediaFiles.length === 0) {
+    if (!content) {
       setError("Vui lòng nhập nội dung và chọn ảnh/video.");
       return;
     }
@@ -69,6 +75,7 @@ export default function AddPost({ onPostCreated }) {
         type: 1,
         permission: permission,
         tags: tags,
+        emotion: 0,
         medias: mediaUrls.map((media) => ({
           url: media.data[0].url,
           resource_type: media.data[0].resource_type,
@@ -94,6 +101,9 @@ export default function AddPost({ onPostCreated }) {
         setError(response.data.message);
       } else {
         setError(null); // Xóa lỗi nếu thành công
+        setContent(""); // Đặt lại nội dung bài đăng
+        setMediaFiles([]); // Xóa file media
+        setMediaType(""); // Đặt lại loại media
         onPostCreated(); // Gọi hàm callback để cập nhật danh sách bài viết
       }
     } catch (error) {
@@ -112,7 +122,11 @@ export default function AddPost({ onPostCreated }) {
           value={content}
           onChange={handleContentChange}
         />
-        <button type="submit" className="btn btn-primary">
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={!content && mediaFiles.length === 0}
+        >
           ĐĂNG
         </button>
       </div>
@@ -126,17 +140,17 @@ export default function AddPost({ onPostCreated }) {
             onChange={handleMediaChange}
           />
           <span>
-            <FontAwesomeIcon icon={faImage} />
+            <FontAwesomeIcon icon={faImage} style={{ paddingRight: "10px" }} />
             Ảnh/Video
           </span>
         </label>
 
         <span>
-          <FontAwesomeIcon icon={faTag} />
+          <FontAwesomeIcon icon={faTag} style={{ paddingRight: "10px" }} />
           Tag
         </span>
         <span>
-          <FontAwesomeIcon icon={faSmile} />
+          <FontAwesomeIcon icon={faSmile} style={{ paddingRight: "10px" }} />
           Cảm xúc
         </span>
       </div>

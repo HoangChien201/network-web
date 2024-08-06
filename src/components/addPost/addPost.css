@@ -44,3 +44,7 @@
 .post-categories span:hover{
     color: var(--color-primary);
 }
+
+button[disabled=disable], .button:disabled{
+    cursor: not-allowed;
+  }

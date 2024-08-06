@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./comments.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
 export default function Comments({ postId }) {
   const [comments, setComments] = useState([]);
@@ -18,6 +20,7 @@ export default function Comments({ postId }) {
             },
           }
         );
+        console.log(response.data);
         setComments(response.data);
       } catch (error) {
         console.error("Error fetching comments:", error);
@@ -33,6 +36,9 @@ export default function Comments({ postId }) {
 
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("User is not authenticated.");
+      }
       const response = await axios.post(
         "https://network-sever-1.onrender.com/comment/",
         { posts_id: postId, content: newComment },
@@ -42,6 +48,7 @@ export default function Comments({ postId }) {
           },
         }
       );
+
       setComments([...comments, response.data]); // Thêm bình luận mới vào danh sách
       setNewComment(""); // Xóa nội dung nhập
     } catch (error) {
@@ -61,17 +68,15 @@ export default function Comments({ postId }) {
               onChange={(e) => setNewComment(e.target.value)}
             />
             <button type="submit" className="btn btn-primary">
+              <FontAwesomeIcon icon={faPaperPlane}/>
               Gửi
             </button>
           </div>
-        </form>
+        </form> 
       </div>
       {comments.map((comment) => (
         <div className="user" key={comment.id}>
-          <img
-            src={comment.user.avatar}
-            alt="User Avatar"
-          />
+          <img src={comment.user.avatar} alt="User Avatar" />
           <div>
             <h5>{comment.user.fullname}</h5>
             <p>{comment.content}</p>
