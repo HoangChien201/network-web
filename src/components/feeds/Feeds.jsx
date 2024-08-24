@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Feed from "./Feed";
 import axios from "axios";
 import AddPost from "../addPost/AddPost";
+import { url } from "../../contants/url";
 
 export default function Feeds() {
   const [userRequestPosts, setUserRequestPosts] = useState([]);
@@ -16,16 +17,24 @@ export default function Feeds() {
 
       console.log("token", token);
 
-      const response = await axios.get(
-        "https://network-sever-1.onrender.com/posts/get-by-user-request",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Thêm token vào header
-          },
-        }
-      );
-      setUserRequestPosts(response.data);
-      console.log("rb", response.data);
+      const response = await axios.get(`${url}/posts/get-by-user-request`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
+      });
+      // Kiểm tra nếu response.data là mảng trước khi lọc
+      if (Array.isArray(response.data)) {
+        // Lọc bài viết có type là 1
+        const filteredPosts = response.data.filter(
+          (post) => post.type === 1 && post.permission === 1
+        );
+        setUserRequestPosts(filteredPosts);
+        console.log("Danh sách bài viết", filteredPosts);
+      } else {
+        // Nếu response.data không phải là mảng, xử lý lỗi
+        setError("Dữ liệu không phải là mảng.");
+        setUserRequestPosts([]);
+      }
     } catch (error) {
       console.error("Error fetching user_request posts:", error);
       if (error.response) {
@@ -58,8 +67,11 @@ export default function Feeds() {
 
   return (
     <div className="feeds">
-      <AddPost onPostCreated={fetchUserRequestPosts} /> {/* Truyền callback */}
-      {userRequestPosts.length > 0 ? (
+      <AddPost onPostCreated={fetchUserRequestPosts} />{" "}
+      {/* Luôn hiển thị AddPost */}
+      {error ? (
+        <div className="feeds">{error}</div>
+      ) : userRequestPosts.length > 0 ? (
         userRequestPosts.map((post) => <Feed key={post.id} fed={post} />)
       ) : (
         <div>Không có bài đăng nào.</div>

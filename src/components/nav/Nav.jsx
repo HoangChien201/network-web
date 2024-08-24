@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 //Fake API Data.................
-import CurrentUser from "../../FackApis/CurrentUserData";
+import CurrentUser from "../leftbar/LeftBar";
 
 //Components......................
 import DarkMoode from "../darkmod/DarkMoode";
@@ -17,6 +17,7 @@ import {
   faEnvelope,
   faUser,
 } from "@fortawesome/free-regular-svg-icons";
+import { url } from "../../contants/url";
 
 export default function Nav() {
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -35,7 +36,7 @@ export default function Nav() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `https://network-sever-1.onrender.com/user/search?keyword=${e.target.value}`,
+        `${url}/user/search?keyword=${e.target.value}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -49,6 +50,16 @@ export default function Nav() {
     setLoading(false);
   };
 
+  const handleResultClick = () => {
+    setSearchKeyword("");
+    setSearchResults([]);
+  };
+
+  const handleHomeClick = () => {
+    // Cuộn lên đầu trang
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <nav>
       <div className="nav-container">
@@ -57,12 +68,16 @@ export default function Nav() {
           <Link to="/">
             <h3 className="logo">NetFogre</h3>
           </Link>
-          <Link to="/">
+          <Link
+            to="/"
+            onClick={handleHomeClick}
+            style={{ background: "none", border: "none", cursor: "pointer" }}
+          >
             <FontAwesomeIcon icon={faHome} />
           </Link>
-          <Link to={`/profile/${CurrentUser.id}`}>
+          {/* <Link to={`/profile/${CurrentUser.id}`}>
             <FontAwesomeIcon icon={faUser} />
-          </Link>
+          </Link> */}
         </div>
 
         <div className="Nav-Searchbar">
@@ -77,10 +92,22 @@ export default function Nav() {
             onChange={handleSearch}
           />
           {loading && <div>Loading...</div>}
+          {!loading && searchKeyword && searchResults.length === 0 && (
+            <div
+              className="search-results"
+              style={{ color: "var(--color-primary)", fontSize: "16px" }}
+            >
+              Không tìm thấy
+            </div>
+          )}
           {searchResults.length > 0 && (
             <div className="search-results">
               {searchResults.map((result) => (
-                <Link key={result.id} to={`/profile/${result.id}`}>
+                <Link
+                  key={result.id}
+                  to={`/profile/${result.id}`}
+                  onClick={handleResultClick}
+                >
                   <div className="search-result-item">
                     <img
                       src={result.avatar || "/path/to/default/avatar.jpg"}
@@ -117,7 +144,7 @@ export default function Nav() {
           <Link to="/">
             <FontAwesomeIcon icon={faBars} />
           </Link>
-          <div className="user">
+          {/* <div className="user">
             <Link to={`/profile/${CurrentUser.id}`} className="user">
               <img
                 src={CurrentUser[0].avatar || "/path/to/default/avatar.jpg"}
@@ -125,7 +152,7 @@ export default function Nav() {
               />
               <h4>{CurrentUser[0].fullname}</h4>
             </Link>
-          </div>
+          </div> */}
         </div>
       </div>
     </nav>

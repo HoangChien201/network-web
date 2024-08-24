@@ -2,10 +2,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import "./login.css";
 import axios from "axios";
-import Fingerprint2 from 'fingerprintjs2';
-import QRCode from 'qrcode.react';
+import Fingerprint2 from "fingerprintjs2";
+import QRCode from "qrcode.react";
 import { url } from "../../contants/url";
-import { socket } from "../../../socket"; 
+import { socket } from "../../../socket";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
@@ -17,26 +17,44 @@ export default function Login() {
   const navigate = useNavigate();
 
   //get id device key
-  const [deviceKey, setDeviceKey] = useState('');
+  const [deviceKey, setDeviceKey] = useState("");
 
   useEffect(() => {
     Fingerprint2.get((components) => {
       const values = components.map((component) => component.value);
-      const murmur = Fingerprint2.x64hash128(values.join(''), 31);
+      const murmur = Fingerprint2.x64hash128(values.join(""), 31);
       console.log(murmur);
-      
+
       //nhận thong tin user được trả về khi bên mobile đẩy sang
-      socket.on(`qr-login-${murmur}`,(data)=>{
+      socket.on(`qr-login-${murmur}`, async (data) => {
         //xử lý đăng nhập
+        try {
+          // const response = await axios.post(`${url}/auth/sign-in/`, {
+          //   email,
+          //   password,
+          // });
+          const {id,token} = data
+          console.log('data',data);
+          
+          console.log('ok');
+          
+          localStorage.setItem("token", token);
+          localStorage.setItem("userId", id); // Lưu userId vào localStorage
+          setError("Đăng nhập thành công!");
+          navigate("/");
+        } catch (error) {
+          setError(
+            "Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin đăng nhập."
+          );
+        }
         console.log(data);
-        
-      })
+      });
 
       setDeviceKey(murmur);
     });
-
   }, []);
   //get id device key
+
   const [loadingAPI, setLoadingAPI] = useState(false);
 
   const validateEmail = (email) => {
@@ -51,11 +69,12 @@ export default function Login() {
     }
     setLoadingAPI(true);
     try {
-      const response = await axios.post(
-        `${url}/auth/sign-in/`,
-        { email, password }
-      );
+      const response = await axios.post(`${url}/auth/sign-in/`, {
+        email,
+        password,
+      });
       localStorage.setItem("token", response.data.data.token);
+      localStorage.setItem("userId", response.data.data.id); // Lưu userId vào localStorage
       setError("Đăng nhập thành công!");
       navigate("/");
     } catch (error) {
@@ -65,7 +84,6 @@ export default function Login() {
     }
     setLoadingAPI(false);
   };
-
 
   return (
     <div className="login">
@@ -78,8 +96,7 @@ export default function Login() {
       <div className="loginWrapper">
         <div className="loginLeft">
           <div className="qrcode">
-            {
-              deviceKey &&
+            {deviceKey && (
               <QRCode
                 value={deviceKey}
                 size={256}
@@ -87,11 +104,9 @@ export default function Login() {
                 fgColor="#000000"
                 level="Q"
               />
-            }
+            )}
           </div>
-          <span>
-            Sử dụng ứng dụng NetForge để quét mã QR
-          </span>
+          <span>Sử dụng ứng dụng NetForge để quét mã QR</span>
         </div>
         <div className="loginRight">
           <div className="loginBox">
@@ -122,7 +137,7 @@ export default function Login() {
             >
               {loadingAPI ? (
                 <span>
-                  <FontAwesomeIcon icon={faSpinner} spin/>
+                  <FontAwesomeIcon icon={faSpinner} spin />
                 </span>
               ) : (
                 "Đăng nhập"

@@ -5,9 +5,10 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { url } from "../../contants/url";
 
 export default function Register() {
-  const [username, setUserName] = useState("");
+  const [fullname, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -39,8 +40,8 @@ export default function Register() {
     setLoadingAPI(false);
     try {
       const response = await axios.post(
-        "https://network-social-sever.onrender.com/user",
-        { username, email, password, role: 2 }
+        `${url}/user`,
+        { fullname, email, password, role: 2 }
       );
       setError("Đăng ký thành công!");
       navigate("/login");
@@ -68,8 +69,8 @@ export default function Register() {
             <input
               placeholder="Tên"
               className="loginInput"
-              value={username}
-              onChange={(e) => setUserName(e.target.value)}
+              value={fullname}
+              onChange={(e) => setFullName(e.target.value)}
             />
             <input
               placeholder="Email"

@@ -15,15 +15,48 @@ import gallery from "../../assets/icon/5.png";
 import videos from "../../assets/icon/6.png";
 import message from "../../assets/icon/7.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPersonThroughWindow, faPowerOff } from "@fortawesome/free-solid-svg-icons";
+import {
+  faDoorOpen,
+  faPersonThroughWindow,
+  faPowerOff,
+} from "@fortawesome/free-solid-svg-icons";
+import { url } from "../../contants/url";
 
 export default function LeftBar() {
   const [friends, setFriends] = useState([]);
   const [error, setError] = useState(null);
 
+  const [currentUser, setCurrentUser] = useState(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchUserData = async () => {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        setError("User not found");
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          `${url}/user/get-one/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        console.log(response.data);
+        setCurrentUser(response.data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setError("Failed to fetch user data");
+      }
+    };
+
+    fetchUserData();
+
     const fetchFriends = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -32,7 +65,7 @@ export default function LeftBar() {
         }
 
         const response = await axios.post(
-          "https://network-sever-1.onrender.com/friendship/get-all",
+          `${url}/friendship/get-all`,
           { status: 2 },
           {
             headers: {
@@ -41,7 +74,7 @@ export default function LeftBar() {
             },
           }
         );
-        console.log(response.data);
+        console.log("Danh sách bạn bè",response.data);
         setFriends(response.data);
       } catch (error) {
         console.error("Error fetching friends data:", error);
@@ -60,14 +93,25 @@ export default function LeftBar() {
     fetchFriends();
   }, []);
 
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (!currentUser) {
+    return <div>{error}</div>; // Hoặc bất kỳ thông báo nào bạn muốn hiển thị khi chưa có thông tin người dùng
+  }
+
   return (
     <div className="leftBar">
       <div className="left-container">
         <div className="menu">
-          <Link to="/profile/id">
+          <Link to={`/profile/${currentUser.id}`}>
             <div className="user">
-              <img src={CurrentUser.map((user) => user.ProfieImage)} alt="" />
-              <h4>Trí</h4>
+              <img
+                src={currentUser.avatar || "CurentProfile.jpeg"}
+                alt=""
+              />
+              <h4>{currentUser.fullname}</h4>
             </div>
           </Link>
 
@@ -78,25 +122,25 @@ export default function LeftBar() {
                 navigate("/login");
               }}
             >
-              <FontAwesomeIcon icon={faPowerOff} />
+              <FontAwesomeIcon icon={faDoorOpen} />
             </button>
           </div>
 
-          <Link to="/">
+          {/* <Link to="/">
             <div className="item">
               <img src={Firend} alt="" />
               <h4>Friends</h4>
             </div>
-          </Link>
+          </Link> */}
 
-          <Link to="/">
+          {/* <Link to="/">
             <div className="item">
               <img src={Groups} alt="" />
               <h4>Groups</h4>
             </div>
-          </Link>
+          </Link> */}
 
-          <Link to="/">
+          {/* <Link to="/">
             <div className="item">
               <img src={Market} alt="" />
               <h4>Market</h4>
@@ -108,12 +152,12 @@ export default function LeftBar() {
               <img src={Watch} alt="" />
               <h4>Watch</h4>
             </div>
-          </Link>
+          </Link> */}
         </div>
 
         <hr />
 
-        <div className="menu">
+        {/* <div className="menu">
           <h4 className="others">Your Shortcuts</h4>
 
           <Link to="/">
@@ -136,12 +180,12 @@ export default function LeftBar() {
               <h4>Message</h4>
             </div>
           </Link>
-        </div>
+        </div> */}
 
-        <hr />
+        {/* <hr /> */}
 
         <div className="menu">
-          <h4 className="others">List Friend</h4>
+          <h4 className="others">Danh sách bạn bè</h4>
           {error ? (
             <div className="error-message">{error}</div>
           ) : (

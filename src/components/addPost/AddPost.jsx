@@ -1,9 +1,10 @@
 import "./addPost.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage, faSmile, faTag } from "@fortawesome/free-solid-svg-icons";
 import CurrentUserData from "../../FackApis/CurrentUserData";
+import { url } from "../../contants/url";
 
 export default function AddPost({ onPostCreated }) {
   const [content, setContent] = useState("");
@@ -12,6 +13,36 @@ export default function AddPost({ onPostCreated }) {
   const [tags, setTags] = useState([]); // Giả sử bạn có một phương thức để thêm tags
   const [permission, setPermission] = useState(1); // Giả sử mặc định là friend
   const [error, setError] = useState(null); // Để lưu trữ lỗi
+
+  const [currentUser, setCurrentUser] = useState("");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        setError("User not found");
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          `${url}/user/get-one/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        console.log(response.data);
+        setCurrentUser(response.data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setError("Failed to fetch user data");
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleContentChange = (e) => {
     setContent(e.target.value);
@@ -54,7 +85,7 @@ export default function AddPost({ onPostCreated }) {
       const formData = new FormData();
       formData.append("files", file);
       const data = await axios.post(
-        "https://network-sever-1.onrender.com/image/uploads",
+        `${url}/image/uploads`,
         formData
       );
       return data;
@@ -85,7 +116,7 @@ export default function AddPost({ onPostCreated }) {
       console.log(postData);
 
       const response = await axios.post(
-        "https://network-sever-1.onrender.com/posts",
+        `${url}/posts`,
         postData,
         {
           headers: {
@@ -115,7 +146,7 @@ export default function AddPost({ onPostCreated }) {
   return (
     <form className="postForm" onSubmit={handleSubmit}>
       <div className="user form-top">
-        <img src={CurrentUserData[0].ProfieImage} alt="User profile" />
+        <img src={currentUser.avatar || ""} alt="User profile" />
         <input
           type="text"
           placeholder="Bạn đang nghĩ gì?"

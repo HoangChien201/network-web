@@ -9,7 +9,7 @@ export default function Profile() {
     <>
       <UserProfile/>
       {/* <AddPost/> */}
-      <Feeds/>
+      {/* <Feeds/> */}
     </>
   )
 }

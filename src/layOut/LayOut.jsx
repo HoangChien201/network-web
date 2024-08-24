@@ -14,6 +14,7 @@ import ChatBox from '../pages/chatbox/ChatBox'
 import Nav from '../components/nav/Nav'
 import LeftBar from '../components/leftbar/LeftBar'
 import RightBar from '../components/rightbar/RightBar'
+import PrivateRoute from '../components/Wraper/PrivateRoute'
 
 
 export default function LayOut() {
@@ -39,7 +40,7 @@ export default function LayOut() {
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <Feed/>,
+      element: <PrivateRoute element={<Feed />} />,
       children: [
         {
           path: '/',
