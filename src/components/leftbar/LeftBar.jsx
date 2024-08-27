@@ -39,14 +39,11 @@ export default function LeftBar() {
       }
 
       try {
-        const response = await axios.get(
-          `${url}/user/get-one/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        const response = await axios.get(`${url}/user/get-one/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         console.log(response.data);
         setCurrentUser(response.data);
       } catch (error) {
@@ -74,7 +71,7 @@ export default function LeftBar() {
             },
           }
         );
-        console.log("Danh sách bạn bè",response.data);
+        console.log("Danh sách bạn bè", response.data);
         setFriends(response.data);
       } catch (error) {
         console.error("Error fetching friends data:", error);
@@ -104,19 +101,14 @@ export default function LeftBar() {
   return (
     <div className="leftBar">
       <div className="left-container">
-        <div className="menu">
-          <Link to={`/profile/${currentUser.id}`}>
-            <div className="user">
-              <img
-                src={currentUser.avatar || "CurentProfile.jpeg"}
-                alt=""
-              />
+        <div className="menu" style={{marginBottom:"10px"}}>
+          <div className="user-logout-container">
+            <Link to={`/profile/${currentUser.id}`} className="user">
+              <img src={currentUser.avatar || "CurentProfile.jpeg"} alt="" />
               <h4>{currentUser.fullname}</h4>
-            </div>
-          </Link>
-
-          <div className="item">
+            </Link>
             <button
+              className="logout-button"
               onClick={() => {
                 localStorage.clear("token");
                 navigate("/login");

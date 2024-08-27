@@ -38,6 +38,11 @@
   margin: 1rem 0;
 }
 
+.user img{
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+}
+
 .bottom-content .action-item {
   cursor: pointer;
   display: flex;

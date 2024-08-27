@@ -288,21 +288,54 @@ export default function UserProfile() {
     }
   };
 
+  const cancelFriendRequest = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const targetUserId = id; // ID của người dùng nhận yêu cầu
+
+      if (!token || !targetUserId) {
+        throw new Error("Thông tin cần thiết không có.");
+      }
+
+      const response = await axios.post(
+        `${url}/friendship/cancle-request`,
+        {
+          user2: targetUserId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data.status === 200) {
+        console.log("Yêu cầu kết bạn đã được hủy thành công");
+        // Cập nhật giao diện hoặc thông báo cho người dùng
+        setHasSentRequest(false);
+      } else {
+        console.error("Lỗi khi hủy yêu cầu kết bạn:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Lỗi khi hủy yêu cầu kết bạn:", error);
+    }
+  };
+
   // Hàm để xác định trạng thái kết bạn
   const renderFriendButton = () => {
     if (user.relationship && user.relationship.status === 2) {
       return (
         <button className="btn btn-secondary">
-          {" "}
           <FontAwesomeIcon icon={faUser} style={{ paddingRight: "5px" }} />
           Bạn bè
         </button>
       );
     } else if (hasSentRequest) {
       return (
-        <button className="btn btn-secondary">
+        <button className="btn btn-secondary" onClick={cancelFriendRequest}>
           <FontAwesomeIcon icon={faBan} style={{ paddingRight: "5px" }} />
-          Hủy kết bạn
+          Hủy yêu cầu
         </button>
       );
     } else if (currentUserId !== id) {

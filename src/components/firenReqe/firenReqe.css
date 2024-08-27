@@ -8,8 +8,14 @@
     flex-direction: column;
 }
 
+.request img{
+    border-radius: 50%;
+    border: 2px solid var(--color-primary);
+}
+
 .request h5{
-    font-size: .9rem;
+    font-size: 15px;
+    padding-right: 115px;
 }
 
 .request .action{
